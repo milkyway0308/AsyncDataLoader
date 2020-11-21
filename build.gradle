@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+group 'skywolf46'
+version '1.1'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation(files("V:/API/Java/Minecraft/Bukkit/Spigot/Spigot 1.12.2.jar"))
+}
