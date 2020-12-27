@@ -31,7 +31,7 @@ public abstract class AbstractDataLoader implements IDataQueueable {
 
     protected synchronized void setLoaded(boolean isLoaded) {
         this.isLoaded.set(isLoaded);
-        if(isLoaded)
+        if (isLoaded)
             runQueued();
     }
 
@@ -71,6 +71,17 @@ public abstract class AbstractDataLoader implements IDataQueueable {
             task = AsyncDataLoader.getTaskFactory(cls).createSaveTask(this);
         }
         saveCountdown.set(countdown);
+    }
+
+    public final void forceSaveSync(Class<? extends AbstractDataTask> cls) {
+        if (task == null || !task.getClass().equals(cls)) {
+            if (AsyncDataLoader.getTaskFactory(cls) == null) {
+                return;
+            }
+            task = AsyncDataLoader.getTaskFactory(cls).createSaveTask(this);
+        }
+        task.cleanUp();
+        task.saveSync();
     }
 
     public final void load(Class<? extends AbstractDataTask> cls) {
