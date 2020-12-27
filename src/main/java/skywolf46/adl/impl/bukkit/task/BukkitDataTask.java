@@ -26,17 +26,21 @@ public class BukkitDataTask extends AbstractDataTask implements Runnable {
     public void run() {
 //        System.out.println("Countdown: " + adl.getSaveCountdown());
         if (adl.getSaveCountdown().decrementAndGet() <= 0) {
-            save();
+            save(null);
         }
     }
 
 
     @Override
-    public void save() {
+    public void save(Runnable afterTask) {
         File file = adl.getFile();
         AbstractDataSnapshot<?> snap = adl.createSnapshot();
         try {
-            Bukkit.getScheduler().runTaskAsynchronously(AsyncDataLoader.inst(), () -> saveSnapshot(file, snap));
+            Bukkit.getScheduler().runTaskAsynchronously(AsyncDataLoader.inst(), () -> {
+                saveSnapshot(file, snap);
+                if (afterTask != null)
+                    afterTask.run();
+            });
         } catch (Exception ex) {
             saveSync();
         }

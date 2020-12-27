@@ -22,7 +22,7 @@ public abstract class AbstractDataTask {
         tasks.clear();
     }
 
-    public abstract void save();
+    public abstract void save(Runnable afterTask);
 
     public abstract void saveSync();
 

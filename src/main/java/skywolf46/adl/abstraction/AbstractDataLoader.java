@@ -84,6 +84,17 @@ public abstract class AbstractDataLoader implements IDataQueueable {
         task.saveSync();
     }
 
+    public final void forceSave(Class<? extends AbstractDataTask> cls, Runnable afterTask) {
+        if (task == null || !task.getClass().equals(cls)) {
+            if (AsyncDataLoader.getTaskFactory(cls) == null) {
+                return;
+            }
+            task = AsyncDataLoader.getTaskFactory(cls).createSaveTask(this);
+        }
+        task.cleanUp();
+        task.save(afterTask);
+    }
+
     public final void load(Class<? extends AbstractDataTask> cls) {
         AsyncDataLoader.getTaskFactory(cls).createLoadTask(this).load();
     }

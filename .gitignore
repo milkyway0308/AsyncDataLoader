@@ -1,4 +1,6 @@
-*
-!*.java
-!*.yml
-!*.kts
+.gradle/*
+.idea/*
+build/*
+*.iml
+*.xml
+*.jar
