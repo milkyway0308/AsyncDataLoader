@@ -13,6 +13,12 @@ buildscript {
 group = "skywolf46"
 version = properties["version"] as String
 
+tasks {
+    processResources {
+        expand("version" to project.properties["version"])
+    }
+}
+
 repositories {
     mavenCentral()
     maven("https://maven.pkg.github.com/milkyway0308/BungeePlayerSync") {
