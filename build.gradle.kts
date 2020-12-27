@@ -15,11 +15,20 @@ version = properties["version"] as String
 
 repositories {
     mavenCentral()
+    maven("https://maven.pkg.github.com/milkyway0308/BungeePlayerSync") {
+        credentials {
+            username = properties["gpr.user"] as String
+            password = properties["gpr.key"] as String
+        }
+    }
+
 }
 
 dependencies {
     // java dependencies
     compileOnly(files("V:/API/Java/Minecraft/Bukkit/Spigot/Spigot 1.12.2.jar"))
+    implementation("skywolf46:bss:1.2.0")
+
 }
 
 publishing {

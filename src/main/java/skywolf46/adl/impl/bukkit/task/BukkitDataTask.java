@@ -5,21 +5,26 @@ import skywolf46.adl.AsyncDataLoader;
 import skywolf46.adl.abstraction.AbstractDataLoader;
 import skywolf46.adl.abstraction.AbstractDataSnapshot;
 import skywolf46.adl.abstraction.AbstractDataTask;
+import skywolf46.adl.abstraction.AbstractFileBasedDataLoader;
 import skywolf46.adl.impl.bukkit.abstraction.AbstractDataStreamSnapshot;
 
 import java.io.*;
 
 public class BukkitDataTask extends AbstractDataTask implements Runnable {
-    private AbstractDataLoader adl;
-    private int task;
+    private final AbstractFileBasedDataLoader adl;
+    private final int task;
 
     public BukkitDataTask(AbstractDataLoader adl) {
-        this.adl = adl;
+        if (!(adl instanceof AbstractFileBasedDataLoader)) {
+            throw new IllegalStateException("BukkitDataTask only supports snapshot extension of AbstractFileBasedDataLoader");
+        }
+        this.adl = (AbstractFileBasedDataLoader) adl;
         task = Bukkit.getScheduler().scheduleSyncRepeatingTask(AsyncDataLoader.inst(), this, 20L, 20L);
     }
 
     @Override
     public void run() {
+//        System.out.println("Countdown: " + adl.getSaveCountdown());
         if (adl.getSaveCountdown().decrementAndGet() <= 0) {
             save();
         }
@@ -29,11 +34,9 @@ public class BukkitDataTask extends AbstractDataTask implements Runnable {
     @Override
     public void save() {
         File file = adl.getFile();
-        AbstractDataSnapshot snap = adl.createSnapshot();
+        AbstractDataSnapshot<?> snap = adl.createSnapshot();
         try {
-            Bukkit.getScheduler().runTaskAsynchronously(AsyncDataLoader.inst(), () -> {
-                saveSnapshot(file, snap);
-            });
+            Bukkit.getScheduler().runTaskAsynchronously(AsyncDataLoader.inst(), () -> saveSnapshot(file, snap));
         } catch (Exception ex) {
             saveSync();
         }
@@ -47,9 +50,7 @@ public class BukkitDataTask extends AbstractDataTask implements Runnable {
 
     @Override
     public void load() {
-        Bukkit.getScheduler().runTaskAsynchronously(AsyncDataLoader.inst(), () -> {
-            adl.load();
-        });
+        Bukkit.getScheduler().runTaskAsynchronously(AsyncDataLoader.inst(), adl::load);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class BukkitDataTask extends AbstractDataTask implements Runnable {
         Bukkit.getScheduler().cancelTask(task);
     }
 
-    private void saveSnapshot(File file, AbstractDataSnapshot snap) {
+    private void saveSnapshot(File file, AbstractDataSnapshot<?> snap) {
         if (!(snap instanceof AbstractDataStreamSnapshot)) {
             throw new IllegalStateException("Error: BukkitDataTask only supports extension of AbstractDataStreamSnapshot");
         }
@@ -75,16 +76,15 @@ public class BukkitDataTask extends AbstractDataTask implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            try {
-                DataOutputStream dos = new DataOutputStream(new FileOutputStream(file, false));
-                ((AbstractDataStreamSnapshot) snap).write(dos);
-                dos.flush();
-                dos.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+        }
+        try {
+            DataOutputStream dos = new DataOutputStream(new FileOutputStream(file, false));
+            ((AbstractDataStreamSnapshot<?>) snap).write(dos);
+            dos.flush();
+            dos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

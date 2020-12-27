@@ -5,14 +5,14 @@ import skywolf46.adl.abstraction.AbstractDataTask;
 import skywolf46.adl.abstraction.AbstractDataTaskFactory;
 import skywolf46.adl.impl.bukkit.task.BukkitDataTask;
 
-public class BukkitAsyncProvider extends AbstractDataTaskFactory {
+public class BukkitAsyncProvider<X extends AbstractDataTask> extends AbstractDataTaskFactory<X> {
     @Override
-    public AbstractDataTask createSaveTask(AbstractDataLoader loader) {
-        return new BukkitDataTask(loader);
+    public X createSaveTask(AbstractDataLoader loader) {
+        return (X) new BukkitDataTask(loader);
     }
 
     @Override
-    public AbstractDataTask createLoadTask(AbstractDataLoader dl) {
-        return new BukkitDataTask(dl);
+    public X  createLoadTask(AbstractDataLoader dl) {
+        return (X) new BukkitDataTask(dl);
     }
 }

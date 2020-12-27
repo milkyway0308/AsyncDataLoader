@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractDataTask {
-    private static List<AbstractDataTask> tasks = new ArrayList<>();
+    private static final List<AbstractDataTask> tasks = new ArrayList<>();
 
     public AbstractDataTask() {
         tasks.add(this);
@@ -14,7 +14,7 @@ public abstract class AbstractDataTask {
         tasks.remove(this);
     }
 
-    public static final void endTask() {
+    public static void endTask() {
         new ArrayList<>(tasks).forEach(r -> {
             r.saveSync();
             r.cleanUp();

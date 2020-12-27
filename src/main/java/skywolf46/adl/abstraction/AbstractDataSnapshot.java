@@ -11,6 +11,4 @@ public abstract class AbstractDataSnapshot<X> {
         this.obj = object;
     }
 
-
-
 }
