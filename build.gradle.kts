@@ -1,5 +1,5 @@
 plugins {
-    id("java")
+    kotlin("jvm") version "1.4.30"
     id ("maven-publish")
 }
 
@@ -8,7 +8,6 @@ buildscript {
         mavenCentral()
     }
 }
-
 
 group = "skywolf46"
 version = properties["version"] as String
@@ -29,6 +28,7 @@ repositories {
     }
 
 }
+
 
 dependencies {
     // java dependencies
