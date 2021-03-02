@@ -6,9 +6,10 @@ import skywolf46.bss.threads.SQLThread
 
 abstract class AbstractSQLThreadTableBasedSnapshot(val table: String, target: SQLThread) :
     AbstractDataSnapshot<SQLThread>(target) {
-    final override fun saveSnapshot() {
+    final override fun saveSnapshotAndRun(unit: () -> Unit) {
         target.addTask {
             saveSnapshot(SQLTable.of(it, table))
+            unit()
         }
     }
 

@@ -26,6 +26,13 @@ repositories {
             password = properties["gpr.key"] as String
         }
     }
+    maven("https://maven.pkg.github.com/FUNetwork/SkywolfExtraUtility") {
+        credentials {
+            username = properties["gpr.user"] as String
+            password = properties["gpr.key"] as String
+        }
+    }
+
 
 }
 
@@ -34,6 +41,7 @@ dependencies {
     // java dependencies
     compileOnly(files("V:/API/Java/Minecraft/Bukkit/Spigot/Spigot 1.12.2.jar"))
     implementation("skywolf46:bss:1.2.0")
+    implementation("skywolf46:exutil:1.26.3")
 
 }
 

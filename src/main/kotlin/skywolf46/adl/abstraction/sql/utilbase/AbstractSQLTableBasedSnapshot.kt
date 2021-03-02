@@ -7,8 +7,9 @@ import java.sql.Connection
 abstract class AbstractSQLTableBasedSnapshot(private val table: String, target: Connection) : AbstractSQLBasedSnapshot(
     target
 ) {
-    override fun saveSnapshot() {
+    override fun saveSnapshotAndrun(unit: () -> Unit) {
         saveSnapshot(SQLTable.of(target, table))
+        unit()
     }
 
     abstract fun saveSnapshot(table: SQLTable)
