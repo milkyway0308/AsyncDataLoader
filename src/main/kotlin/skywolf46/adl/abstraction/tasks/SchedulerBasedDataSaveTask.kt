@@ -1,12 +1,15 @@
 package skywolf46.adl.abstraction.tasks
 
 import org.bukkit.Bukkit
+import org.bukkit.World
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld
+import org.bukkit.entity.ArmorStand
+import org.bukkit.event.entity.CreatureSpawnEvent
 import skywolf46.adl.AsyncDataLoader
 import skywolf46.adl.abstraction.AbstractDataLoader
-import skywolf46.adl.abstraction.AbstractDataSnapshot
 import skywolf46.adl.abstraction.AbstractDataTask
 
-class SchedulerBasedDataSaveTask(snapshot: AbstractDataLoader<*,*>) :
+class SchedulerBasedDataSaveTask(snapshot: AbstractDataLoader<*, *>) :
     AbstractDataTask(
         snapshot
     ) {
@@ -16,12 +19,12 @@ class SchedulerBasedDataSaveTask(snapshot: AbstractDataLoader<*,*>) :
         if (taskID != Int.MIN_VALUE) {
             return
         }
-        taskID = Bukkit.getScheduler().scheduleSyncDelayedTask(AsyncDataLoader.inst) {
+        taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(AsyncDataLoader.inst, {
             if (leftTime.decrementAndGet() <= 0) {
                 stopTimer()
                 triggerAsync()
             }
-        }
+        }, 20L, 20L)
     }
 
     override fun trigger() {
@@ -38,7 +41,7 @@ class SchedulerBasedDataSaveTask(snapshot: AbstractDataLoader<*,*>) :
     }
 
     override fun stopTimer() {
-        if (taskID == Int.MIN_VALUE) {
+        if (taskID != Int.MIN_VALUE) {
             Bukkit.getScheduler().cancelTask(taskID)
             taskID = Int.MIN_VALUE
         }

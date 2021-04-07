@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "1.4.30"
-    id ("maven-publish")
+    id("maven-publish")
 }
 
 buildscript {
@@ -20,29 +20,16 @@ tasks {
 
 repositories {
     mavenCentral()
-    maven("https://maven.pkg.github.com/milkyway0308/BungeePlayerSync") {
-        credentials {
-            username = properties["gpr.user"] as String
-            password = properties["gpr.key"] as String
-        }
-    }
-    maven("https://maven.pkg.github.com/FUNetwork/SkywolfExtraUtility") {
-        credentials {
-            username = properties["gpr.user"] as String
-            password = properties["gpr.key"] as String
-        }
-    }
-
-
+    maven(properties["reposilite.release"] as String)
+    maven(properties["reposilite.spigot"] as String)
 }
 
 
 dependencies {
     // java dependencies
-    compileOnly(files("V:/API/Java/Minecraft/Bukkit/Spigot/Spigot 1.12.2.jar"))
-    implementation("skywolf46:bss:1.2.0")
-    implementation("skywolf46:exutil:1.26.3")
-
+    compileOnly("org.spigotmc:spigot:1.12.2")
+    compileOnly("skywolf46:bss:1.6.1")
+    compileOnly("skywolf46:exutil:1.35.1")
 }
 
 publishing {
@@ -55,16 +42,24 @@ publishing {
                 password = properties["gpr.key"] as String
             }
         }
+        maven {
+            name = "Reposilite"
+            url = uri(properties["reposilite.release"] as String)
+            credentials {
+                username = properties["reposilite.user"] as String
+                password = properties["reposilite.token"] as String
+            }
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
     }
-    publications{
-        create<MavenPublication>("jar"){
+    publications {
+        create<MavenPublication>("jar") {
             from(components["java"])
             groupId = "skywolf46"
             artifactId = "asyncdataloader"
             version = properties["version"] as String
-            pom{
-                url.set("https://github.com/milkyway0308/AsyncDataLoader.git")
-            }
         }
     }
 }
