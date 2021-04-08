@@ -8,7 +8,7 @@ import skywolf46.extrautility.util.ifTrue
 import skywolf46.extrautility.util.runNonNull
 import java.util.concurrent.atomic.AtomicBoolean
 
-abstract class AbstractDataLoader<T, F : AbstractDataSnapshot<T>> {
+abstract class AbstractDataLoader<T, F : AbstractDataSnapshot<T>> : IDataQueueable{
     var isLoaded: AtomicBoolean = AtomicBoolean(false)
         private set
     val cache: MutableList<AbstractDataLoader<T, F>.() -> Unit> = ArrayList()

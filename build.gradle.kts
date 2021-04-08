@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.4.30"
+    kotlin("jvm") version "1.4.32"
     id("maven-publish")
 }
 
@@ -27,9 +27,13 @@ repositories {
 
 dependencies {
     // java dependencies
+    compileOnly(kotlin("stdlib"))
+
     compileOnly("org.spigotmc:spigot:1.12.2")
     compileOnly("skywolf46:bss:1.6.1")
-    compileOnly("skywolf46:exutil:1.35.1")
+    compileOnly("skywolf46:exutil:1.35.2") {
+        isChanging = true
+    }
 }
 
 publishing {
