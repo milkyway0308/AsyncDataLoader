@@ -1,5 +1,0 @@
-name: AsyncDataLoader
-version: ${version}
-main: skywolf46.adl.AsyncDataLoader
-softdepend:
-  - BukkitSQLSupport

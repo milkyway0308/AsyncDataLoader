@@ -1,0 +1,5 @@
+name: AsyncDataLoader-Core
+version: 1.0
+main: skywolf46.asyncdataloader.core.AsyncDataLoader
+depend:
+  - SkywolfExtraUtility
