@@ -1,6 +1,6 @@
 name: AsyncDataLoader-FileSystem
 version: 1.0
-main: skywolf46.asyncdataloader.file.AsyncDataLoader
+main: skywolf46.asyncdataloader.file.FileBasedDataLoaderPlugin
 depend:
   - SkywolfExtraUtility
   - AsyncDataLoader-Core

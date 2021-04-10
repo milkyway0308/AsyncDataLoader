@@ -1,5 +1,6 @@
 package skywolf46.asyncdataloader.core
 
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import skywolf46.asyncdataloader.core.init.DataLoaderInitializer
 
@@ -11,6 +12,8 @@ class AsyncDataLoader : JavaPlugin() {
 
     override fun onEnable() {
         inst = this
-        DataLoaderInitializer.initialize()
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this) {
+            DataLoaderInitializer.initialize()
+        }
     }
 }
