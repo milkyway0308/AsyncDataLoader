@@ -87,12 +87,12 @@ object DataLoaderInitializer {
                     }
                     className = className.replace('/', '.')
                     try {
-                        var c: Class<*> = Class.forName(className)
-                        if (c.modifiers.and(Modifier.ABSTRACT) != 0){
-                            println("AsyncDataLoader | Detected initializer from abstract class ${c.simpleName}, skipping...")
-                            continue
-                        }
+                        val c: Class<*> = Class.forName(className)
                         if (AbstractDataLoaderInitializer::class.java.isAssignableFrom(c)) {
+                            if (c.modifiers.and(Modifier.ABSTRACT) != 0) {
+                                println("AsyncDataLoader | Detected initializer from abstract class ${c.simpleName}, skipping...")
+                                continue
+                            }
                             println("AsyncDataLoader | Detected initializer from ${c.simpleName}, initializing...")
                             try {
                                 (c.newInstance() as AbstractDataLoaderInitializer).load()
