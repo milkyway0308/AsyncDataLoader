@@ -1,5 +1,6 @@
 plugins {
-    id("maven-publish")
+    `maven-publish`
+    kotlin("jvm") version "1.4.32" apply false
 }
 
 buildscript {
@@ -22,7 +23,6 @@ repositories {
     maven(properties["reposilite.release"] as String)
     maven(properties["reposilite.spigot"] as String)
 }
-
 
 dependencies {
     // java dependencies
