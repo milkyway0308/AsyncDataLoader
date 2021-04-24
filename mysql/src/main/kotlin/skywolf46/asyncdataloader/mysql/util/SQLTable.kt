@@ -8,7 +8,7 @@ class SQLTable(val connection: Connection?, val tableName: String) {
     @Deprecated("This constructor only allowed for testing")
     internal constructor(str: String) : this(null, str)
 
-    fun prepare(sql: ISQLConvertible) = connection?.prepareStatement(sql.toSQLString())
+//    fun prepare(sql: ISQLConvertible) = connection?.prepareStatement(sql.toSQLString())
 
 
 }

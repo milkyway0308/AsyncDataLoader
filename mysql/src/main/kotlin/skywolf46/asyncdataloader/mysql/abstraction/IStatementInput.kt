@@ -1,5 +1,6 @@
 package skywolf46.asyncdataloader.mysql.abstraction
 
+import skywolf46.asyncdataloader.mysql.util.SQLResult
 import skywolf46.asyncdataloader.mysql.util.StatementInjector
 
 interface IStatementInput {
@@ -74,9 +75,9 @@ interface IStatementInput {
      * Reset statement.
      * After reset, statement will be remake.
      */
-    fun reset(unit: IStatementInput.() -> Unit)
+    fun reset(unit: IStatementInput.() -> Unit) : IStatementInput
 
     fun getSQL(): String
 
-    fun execute(obj: List<Any>)
+    fun execute(obj: MutableList<Any>, unit: SQLResult.() -> Unit)
 }

@@ -11,7 +11,7 @@ class SQLSelector(table: SQLTable) : AbstractQueryable(table) {
 
 
     override fun getSQLString(): String {
-
+        TODO("Not yet implemented")
     }
 
     override fun getSQLObjects(): List<Any> {
