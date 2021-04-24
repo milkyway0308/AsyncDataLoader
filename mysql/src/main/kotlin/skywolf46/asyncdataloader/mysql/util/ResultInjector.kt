@@ -615,7 +615,7 @@ class ResultInjector(private val main: ResultSet) : ResultSet {
     }
 
     override fun updateBlob(columnIndex: Int, inputStream: InputStream?, length: Long) {
-        main.updateBlob(columnIndex)
+        main.updateBlob(columnIndex, inputStream, length)
     }
 
     override fun updateBlob(columnLabel: String?, inputStream: InputStream?, length: Long) {
