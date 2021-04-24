@@ -9,6 +9,6 @@ abstract class AbstractTaskReadyProvider {
     }
 
     abstract fun doAsync(snapshot: () -> Unit)
-    abstract fun registerTask(provider: DataCounter<AbstractDataLoader>)
+    abstract fun registerTask(provider: DataCounter<AbstractDataLoader<Any>>)
 
 }

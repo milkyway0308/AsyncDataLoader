@@ -7,12 +7,16 @@ import skywolf46.asyncdataloader.core.abstraction.enums.LoadState
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
-abstract class AbstractDataLoader : IDataQueueable {
-    var task: DataCounter<AbstractDataLoader>? = null
+abstract class AbstractDataLoader<T : Any> : IDataQueueable<T> {
+    var task: DataCounter<AbstractDataLoader<T>>? = null
     protected val loaded = AtomicReference(LoadState.READY)
     private val cache: MutableList<(Any) -> Unit> = mutableListOf()
 
     abstract fun snapshot(): AbstractDataSnapshot
+
+    operator fun invoke(unit: T.() -> Unit) {
+        runIfLoaded(unit)
+    }
 
     fun <K : Any, X : Any> loadRequest(loader: AbstractDataLoadRequester<K, X>, data: K, loadTask: X.() -> Unit) {
         loader.trigger(data, main = loadTask) {
@@ -34,7 +38,7 @@ abstract class AbstractDataLoader : IDataQueueable {
     ) {
         task?.reset(saveCountdown) ?: run {
             task = DataCounter(AtomicInteger(saveCountdown), this)
-            taskReady?.registerTask(task!!) ?: run {
+            taskReady?.registerTask(task!! as DataCounter<AbstractDataLoader<Any>>) ?: run {
                 throw IllegalStateException("No default AbstractTaskReadyProvider exists.")
             }
         }
@@ -53,7 +57,7 @@ abstract class AbstractDataLoader : IDataQueueable {
         }
     }
 
-    override fun <T : IDataQueueable> T.runIfLoaded(unit: (T) -> Unit) {
+    override fun runIfLoaded(unit: T.() -> Unit) {
         synchronized(loaded) {
             if (loaded.get() != LoadState.READY) {
                 unit(this@AbstractDataLoader as T)

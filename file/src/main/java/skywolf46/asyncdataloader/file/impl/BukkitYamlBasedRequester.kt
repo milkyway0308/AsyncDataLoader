@@ -18,10 +18,11 @@ object BukkitYamlBasedRequester : AbstractDataLoadRequester<File, YamlConfigurat
         try {
             request(data).let {
                 it?.run {
+                    main(this)
                     afterRun(LoadState.LOADED)
-                } ?: {
-                    afterRun(LoadState.EMPTY_LOAD)
+                    return@let
                 }
+                afterRun(LoadState.EMPTY_LOAD)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -31,6 +32,11 @@ object BukkitYamlBasedRequester : AbstractDataLoadRequester<File, YamlConfigurat
 
 }
 
-fun <T : AbstractDataLoader> T.loadBukkitYaml(file: File, unit: YamlConfiguration.() -> Unit) {
+fun <T : AbstractDataLoader<*>> T.loadBukkitYaml(file: File, unit: YamlConfiguration.() -> Unit) {
     this.loadRequest(BukkitYamlBasedRequester, file, unit)
+}
+
+
+fun <T : AbstractDataLoader<*>> T.loadBukkitYamlAsync(file: File, unit: YamlConfiguration.() -> Unit) {
+    this.asyncLoadRequest(BukkitYamlBasedRequester, file, unit)
 }

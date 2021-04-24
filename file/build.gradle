@@ -59,7 +59,7 @@ publishing {
     publications {
         create("jar", MavenPublication) {
             groupId 'skywolf46'
-            artifactId 'asyncdataloader-file'
+            artifactId "${rootProject.name.toLowerCase()}-${project.name}"
             version rootProject.properties['version'] as String
             from components.java
         }

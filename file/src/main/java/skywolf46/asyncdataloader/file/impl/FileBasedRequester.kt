@@ -42,6 +42,11 @@ object FileBasedRequester : AbstractDataLoadRequester<File, SafeDataInput<DataIn
 
 }
 
-fun <T : AbstractDataLoader> T.loadFile(file: File, unit: (SafeDataInput<DataInputStream>) -> Unit) {
+fun <T : AbstractDataLoader<*>> T.loadFile(file: File, unit: (SafeDataInput<DataInputStream>) -> Unit) {
     this.loadRequest(FileBasedRequester, file, unit)
+}
+
+
+fun <T : AbstractDataLoader<*>> T.loadFileAsync(file: File, unit: (SafeDataInput<DataInputStream>) -> Unit) {
+    this.asyncLoadRequest(FileBasedRequester, file, unit)
 }

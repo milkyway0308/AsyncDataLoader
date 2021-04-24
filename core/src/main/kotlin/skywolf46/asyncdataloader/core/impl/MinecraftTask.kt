@@ -13,7 +13,7 @@ object MinecraftTask : AbstractTaskReadyProvider() {
         }
     }
 
-    override fun registerTask(provider: DataCounter<AbstractDataLoader>) {
+    override fun registerTask(provider: DataCounter<AbstractDataLoader<Any>>) {
         provider.cancelTask()
         val id = Bukkit.getScheduler().scheduleSyncRepeatingTask(
             AsyncDataLoader.inst, {
