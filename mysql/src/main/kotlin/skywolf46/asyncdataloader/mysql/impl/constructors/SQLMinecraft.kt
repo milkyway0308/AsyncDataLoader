@@ -24,7 +24,5 @@ class SQLMinecraft {
         override fun requires(): List<ISQLStructure<*>> {
             return listOf(SQLBases.Double, SQLBases.Double, SQLBases.Double)
         }
-
-
     }
 }
