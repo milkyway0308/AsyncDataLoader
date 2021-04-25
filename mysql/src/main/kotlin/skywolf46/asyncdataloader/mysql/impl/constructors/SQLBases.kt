@@ -1,8 +1,10 @@
-package skywolf46.asyncdataloader.mysql.impl
+package skywolf46.asyncdataloader.mysql.impl.constructors
 
 import skywolf46.asyncdataloader.mysql.abstraction.ISQLStructure
 import skywolf46.asyncdataloader.mysql.abstraction.IStatementInput
+import skywolf46.asyncdataloader.mysql.abstraction.IStatementOutput
 import skywolf46.asyncdataloader.mysql.util.SQLResult
+import java.util.*
 
 sealed class SQLBases<T : Any> : ISQLStructure<T> {
 
@@ -11,7 +13,7 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
             return "S"
         }
 
-        override fun construct(baseName: kotlin.String, table: SQLResult): kotlin.String {
+        override fun construct(table: IStatementOutput): kotlin.String {
             TODO("Not yet implemented")
         }
 
@@ -30,6 +32,7 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
         override fun hashCode(): kotlin.Int {
             return System.identityHashCode(this)
         }
+
     }
 
 
@@ -38,7 +41,8 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
             TODO("Not yet implemented")
         }
 
-        override fun construct(baseName: kotlin.String, table: SQLResult): kotlin.Int {
+
+        override fun construct(table: IStatementOutput): kotlin.Int {
             TODO("Not yet implemented")
         }
 
@@ -49,6 +53,7 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
         override fun getConstructor(): kotlin.String {
             return "INT"
         }
+
     }
 
     object Double : SQLBases<kotlin.Double>() {
@@ -56,7 +61,7 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
             return "D"
         }
 
-        override fun construct(baseName: kotlin.String, table: SQLResult): kotlin.Double {
+        override fun construct(table: IStatementOutput): kotlin.Double {
             TODO("Not yet implemented")
         }
 
@@ -67,6 +72,7 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
         override fun getConstructor(): kotlin.String {
             return "DOUBLE"
         }
+
     }
 
     object UUID : SQLBases<java.util.UUID>() {
@@ -74,7 +80,7 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
             return "UID"
         }
 
-        override fun construct(baseName: kotlin.String, table: SQLResult): java.util.UUID {
+        override fun construct(table: IStatementOutput): java.util.UUID {
             TODO("Not yet implemented")
         }
 
@@ -85,5 +91,6 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
         override fun getConstructor(): kotlin.String {
             return "VARCHAR(36)"
         }
+
     }
 }

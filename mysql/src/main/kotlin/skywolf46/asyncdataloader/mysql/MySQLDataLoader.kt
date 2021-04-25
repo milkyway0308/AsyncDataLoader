@@ -1,4 +1,9 @@
 package skywolf46.asyncdataloader.mysql
 
-class MySQLDataLoader {
+import org.bukkit.plugin.java.JavaPlugin
+
+class MySQLDataLoader : JavaPlugin(){
+    override fun onEnable() {
+        super.onEnable()
+    }
 }

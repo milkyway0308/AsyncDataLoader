@@ -1,8 +1,9 @@
-package skywolf46.asyncdataloader.mysql.impl
+package skywolf46.asyncdataloader.mysql.impl.constructors
 
+import org.bukkit.util.Vector
 import skywolf46.asyncdataloader.mysql.abstraction.ISQLStructure
 import skywolf46.asyncdataloader.mysql.abstraction.IStatementInput
-import skywolf46.asyncdataloader.mysql.util.SQLResult
+import skywolf46.asyncdataloader.mysql.abstraction.IStatementOutput
 
 class SQLMinecraft {
     object Vector : ISQLStructure<org.bukkit.util.Vector> {
@@ -10,17 +11,20 @@ class SQLMinecraft {
             return "VEC"
         }
 
-        override fun construct(baseName: String, table: SQLResult): org.bukkit.util.Vector {
-            TODO("Not yet implemented")
+        override fun construct(table: IStatementOutput): org.bukkit.util.Vector {
+            return Vector(table.getDouble(), table.getDouble(), table.getDouble())
         }
 
         override fun deconstruct(data: org.bukkit.util.Vector, statement: IStatementInput) {
-            TODO("Not yet implemented")
+            statement.appendDouble(data.x)
+            statement.appendDouble(data.y)
+            statement.appendDouble(data.z)
         }
 
         override fun requires(): List<ISQLStructure<*>> {
             return listOf(SQLBases.Double, SQLBases.Double, SQLBases.Double)
         }
+
 
     }
 }

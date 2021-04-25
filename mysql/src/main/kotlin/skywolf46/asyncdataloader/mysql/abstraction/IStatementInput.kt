@@ -79,5 +79,6 @@ interface IStatementInput {
 
     fun getSQL(): String
 
-    fun execute(obj: MutableList<Any>, unit: SQLResult.() -> Unit)
+    fun executeQuery(obj: MutableList<Any>, unit: IStatementOutput.() -> Unit)
+    fun execute(obj: MutableList<Any>)
 }

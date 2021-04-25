@@ -2,6 +2,8 @@ package skywolf46.asyncdataloader.mysql.util
 
 import skywolf46.asyncdataloader.mysql.abstraction.IByteFilter
 import skywolf46.asyncdataloader.mysql.abstraction.IStatementInput
+import skywolf46.asyncdataloader.mysql.abstraction.IStatementOutput
+import skywolf46.asyncdataloader.mysql.storage.SQLStructureStorage
 import java.io.InputStream
 import java.io.Reader
 import java.math.BigDecimal
@@ -608,31 +610,38 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
     }
 
     override fun appendByte(x: Byte) {
-        setByte(currentCursor++, x)
+        setByte(currentCursor, x)
+        currentCursor++
     }
 
     override fun appendShort(x: Short) {
-        setShort(currentCursor++, x)
+        setShort(currentCursor, x)
+        currentCursor++
     }
 
     override fun appendInt(x: Int) {
-        setInt(currentCursor++, x)
+        setInt(currentCursor, x)
+        currentCursor++
     }
 
     override fun appendLong(x: Long) {
-        setLong(currentCursor++, x)
+        setLong(currentCursor, x)
+        currentCursor++
     }
 
     override fun appendFloat(x: Float) {
-        setFloat(currentCursor++, x)
+        setFloat(currentCursor, x)
+        currentCursor++
     }
 
     override fun appendDouble(x: Double) {
-        setDouble(currentCursor++, x)
+        setDouble(currentCursor, x)
+        currentCursor++
     }
 
     override fun appendString(x: String) {
-        setString(currentCursor++, x)
+        setString(currentCursor, x)
+        currentCursor++
     }
 
     private var isCancelled = false
@@ -675,7 +684,12 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
     }
 
     override fun append(x: Any?) {
-        TODO("Not yet implemented")
+        if (x == null) {
+            return
+        }
+        val structure = SQLStructureStorage.get(x.javaClass.kotlin)
+        structure?.deconstruct(x, this)
+            ?: throw IllegalStateException("SQL deserialization for ${x.javaClass.name} not supported")
     }
 
     override fun cancelTask(runAfter: IStatementInput.() -> Unit) {
@@ -689,9 +703,19 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
         while (index < objs.size) {
             if (isCancelled)
                 return
-            // TODO add SQL Constructor call
-            index++
+            append(objs[index++])
         }
+        unit(this)
+        revoker?.let {
+            executeQuery().run {
+                try {
+                    it(ResultInjector(this))
+                } catch (_: Exception) {
+                }
+                if (!isClosed)
+                    close()
+            }
+        } ?: execute()
     }
 
     // TODO remove it
@@ -744,12 +768,21 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
 
     private var index = 0
     private var objs = mutableListOf<Any>()
-    private var revoker: (SQLResult.() -> Unit)? = null
-    override fun execute(obj: MutableList<Any>, unit: SQLResult.() -> Unit) {
+    private var revoker: (IStatementOutput.() -> Unit)? = null
+    override fun executeQuery(obj: MutableList<Any>, unit: IStatementOutput.() -> Unit) {
         reset { }
         index = 0
         objs = obj
         revoker = unit
+        revokeTask()
+        // TODO add unit call
+    }
+
+    override fun execute(obj: MutableList<Any>) {
+        reset { }
+        index = 0
+        objs = obj
+        revoker = null
         revokeTask()
         // TODO add unit call
     }

@@ -1,5 +1,10 @@
 package skywolf46.asyncdataloader.mysql.util
 
+import skywolf46.asyncdataloader.mysql.abstraction.IByteFilter
+import skywolf46.asyncdataloader.mysql.abstraction.ISQLStructure
+import skywolf46.asyncdataloader.mysql.abstraction.IStatementOutput
+import skywolf46.asyncdataloader.mysql.data.CachedQueryRow
+import skywolf46.asyncdataloader.mysql.data.FilterReady
 import java.io.InputStream
 import java.io.Reader
 import java.math.BigDecimal
@@ -8,8 +13,127 @@ import java.sql.*
 import java.sql.Array
 import java.sql.Date
 import java.util.*
+import kotlin.reflect.KClass
 
-class ResultInjector(private val main: ResultSet) : ResultSet {
+class ResultInjector(private val main: ResultSet) : ResultSet, IStatementOutput {
+    private val filters = mutableListOf<IByteFilter>()
+    private var cache: CachedQueryRow? = null
+    private var pointer = 1
+    var hasValue = true
+        private set
+
+    init {
+        if (!main.next()) {
+            hasValue = false
+            main.close()
+        }
+    }
+
+    override fun getByte(): Byte {
+        val data = getByte(pointer++)
+        if (cache != null)
+            cache?.lst?.add(data)
+        return data
+    }
+
+    override fun getShort(): Short {
+        val data = getShort(pointer++)
+        if (cache != null)
+            cache?.lst?.add(data)
+        return data
+    }
+
+    override fun getInt(): Int {
+        val data = getInt(pointer++)
+        if (cache != null)
+            cache?.lst?.add(data)
+        return data
+    }
+
+    override fun getLong(): Long {
+        val data = getLong(pointer++)
+        if (cache != null)
+            cache?.lst?.add(data)
+        return data
+    }
+
+    override fun getFloat(): Float {
+        val data = getFloat(pointer++)
+        if (cache != null)
+            cache?.lst?.add(data)
+        return data
+    }
+
+    override fun getDouble(): Double {
+        val data = getDouble(pointer++)
+        if (cache != null)
+            cache?.lst?.add(data)
+        return data
+    }
+
+    override fun getByteArray(): ByteArray {
+        var data = getBytes(pointer++)
+        if (cache != null)
+            cache?.lst?.add(FilterReady(filters, data))
+        else
+            filters.forEach {
+                data = it.filterSync(data)
+            }
+        return data
+    }
+
+    override fun getByteArrayWithoutFilter(): ByteArray {
+        val data = getBytes(pointer++)
+        if (cache != null)
+            cache?.lst?.add(data)
+        return data
+    }
+
+    override fun appendFilter(filter: IByteFilter): IStatementOutput {
+        filters.add(filter)
+        return this
+    }
+
+    override fun <T : Any> get(const: ISQLStructure<T>): T? {
+        if (cache != null) {
+            loopIfNotProxy(const.uncast())
+            return null
+        }
+        return const.construct(this)
+    }
+
+    private fun loopIfNotProxy(const: ISQLStructure<Any>) {
+        if (const.isProxy())
+            const.construct(this)
+        else
+            for (x in const.requires())
+                loopIfNotProxy(x.uncast())
+    }
+
+    override fun <T : Any> get(cls: KClass<T>): T {
+        TODO("Not yet implemented")
+    }
+
+    override fun <T : Any> get(cls: Class<T>): T {
+        TODO("Not yet implemented")
+    }
+
+    override fun toResultInjector(): ResultInjector {
+        return this
+    }
+
+    override fun toStatementOutput(): IStatementOutput {
+        return this
+    }
+
+    fun cache(unit: IStatementOutput.() -> Unit): CachedQueryRow {
+        cache = CachedQueryRow()
+        unit(this)
+        val c = cache
+        cache = null
+        return c!!
+    }
+
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         return main.unwrap(iface)
     }
@@ -23,6 +147,9 @@ class ResultInjector(private val main: ResultSet) : ResultSet {
     }
 
     override fun next(): Boolean {
+        if (!hasValue)
+            return false
+        pointer = 1
         return main.next()
     }
 
