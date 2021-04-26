@@ -10,9 +10,19 @@ import java.util.*
 
 class MySQLLoaderInitializer : AbstractDataLoaderInitializer() {
     override fun load() {
+        println("AsyncDataLoader - MySQL | Initializing...")
+        println("AsyncDataLoader - MySQL | Registering Structures..")
         SQLStructureStorage.register(SQLBases.Int, Int::class)
         SQLStructureStorage.register(SQLBases.Double, Double::class)
         SQLStructureStorage.register(SQLBases.UUID, UUID::class)
         SQLStructureStorage.register(SQLMinecraft.Vector, Vector::class)
+        println("AsyncDataLoader - MySQL | Creating SQL thread pool...")
+
+        try {
+
+        } catch (e: Exception) {
+            System.err.println("AsyncDataLoader - MySQL | SQL Connection failed! Check setting in file \"mysql.properties\" and retry.")
+        }
+
     }
 }

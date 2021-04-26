@@ -3,7 +3,7 @@ package skywolf46.asyncdataloader.mysql
 import org.bukkit.util.Vector
 import org.junit.jupiter.api.Test
 import skywolf46.asyncdataloader.mysql.data.DatabaseSelector
-import skywolf46.asyncdataloader.mysql.impl.SQLSelector
+import skywolf46.asyncdataloader.mysql.util.SQLSelector
 import skywolf46.asyncdataloader.mysql.impl.constructors.SQLBases
 import skywolf46.asyncdataloader.mysql.impl.constructors.SQLMinecraft
 import skywolf46.asyncdataloader.mysql.initializer.MySQLLoaderInitializer
@@ -15,12 +15,12 @@ import java.util.*
 class Tester {
 
 
-    @Test
+//    @Test
     fun compareEqualStringTest() {
         println(TestTripleVector().toSQLEqualString("test"))
     }
 
-    @Test
+//    @Test
     fun fullSelectTest() {
         MySQLLoaderInitializer().load()
         val sql = SQLSelector(SQLTable("test"))
@@ -29,12 +29,12 @@ class Tester {
         println(sql.getSQLString())
     }
 
-    @Test
+//    @Test
     fun counterTest() {
         println(TestTripleVector().count())
     }
 
-    @Test
+//    @Test
     fun tableTest() {
         val table = SQLTable("test5")
             .construct()
@@ -46,7 +46,7 @@ class Tester {
         println(table.getSQLString())
     }
 
-    @Test
+//    @Test
     fun injectNow() {
         MySQLLoaderInitializer().load()
         Class.forName("com.mysql.jdbc.Driver")
@@ -64,26 +64,24 @@ class Tester {
     val testUUID = UUID.fromString("8dccd76d-19aa-4f2d-919d-419f15aa3159")
     val testVector = Vector(3, 3, 3)
 
-    @Test
+//    @Test
     fun addValue() {
         MySQLLoaderInitializer().load()
         Class.forName("com.mysql.jdbc.Driver")
         val con = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "1111")
         val db = DatabaseSelector(con, "testDB")
-        val table = db.tableOf("tester")
+        val table = db.tableOf("testLevel")
         table.construct()
             .with("playerUID", SQLBases.UUID) {
                 primary = true
             }
-            .with("location", SQLMinecraft.Vector)
+            .with("level", SQLBases.Int)
+            .with("xp", SQLBases.Double)
             .create()
-        table.insert()
-            .with(testUUID)
-            .with(testVector)
-            .insert()
+        table.replaceRow(testUUID, 80, 45)
     }
 
-    @Test
+//    @Test
     fun getValue() {
         MySQLLoaderInitializer().load()
         Class.forName("com.mysql.jdbc.Driver")
@@ -102,4 +100,19 @@ class Tester {
                 println("Selected $this")
             }
     }
+
+
+    fun compressionGetTest() {
+        MySQLLoaderInitializer().load()
+        Class.forName("com.mysql.jdbc.Driver")
+        val con = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "1111")
+        val db = DatabaseSelector(con, "testDB")
+        val table = db.tableOf("tester")
+        table.construct()
+            .with("playerUID", SQLBases.UUID) {
+                primary = true
+            }
+            .create()
+    }
+
 }

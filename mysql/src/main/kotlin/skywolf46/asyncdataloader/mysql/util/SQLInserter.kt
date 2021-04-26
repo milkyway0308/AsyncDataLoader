@@ -1,14 +1,13 @@
-package skywolf46.asyncdataloader.mysql.impl
+package skywolf46.asyncdataloader.mysql.util
 
 import skywolf46.asyncdataloader.mysql.abstraction.AbstractQueryable
 import skywolf46.asyncdataloader.mysql.storage.SQLStructureStorage
-import skywolf46.asyncdataloader.mysql.util.SQLTable
-import skywolf46.asyncdataloader.mysql.util.StatementInjector
 
 class SQLInserter(table: SQLTable) : AbstractQueryable(table) {
     private val lst = mutableListOf<Any>()
-    fun with(obj: Any): SQLInserter {
-        lst += obj
+    fun with(vararg obj: Any): SQLInserter {
+        for (x in obj)
+            lst.add(x)
         return this
     }
 

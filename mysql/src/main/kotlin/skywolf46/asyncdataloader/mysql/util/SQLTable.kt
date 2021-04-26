@@ -2,8 +2,6 @@ package skywolf46.asyncdataloader.mysql.util
 
 import skywolf46.asyncdataloader.mysql.abstraction.AbstractQueryable
 import skywolf46.asyncdataloader.mysql.abstraction.ISQLStructure
-import skywolf46.asyncdataloader.mysql.impl.SQLInserter
-import skywolf46.asyncdataloader.mysql.impl.SQLSelector
 import java.sql.Connection
 
 class SQLTable(val connection: Connection?, val tableName: String) {
@@ -12,19 +10,27 @@ class SQLTable(val connection: Connection?, val tableName: String) {
     internal constructor(str: String) : this(null, str)
 
 
-
     //    fun prepare(sql: ISQLConvertible) = connection?.prepareStatement(sql.toSQLString())
     fun construct(): ConnectedConstructor {
         return ConnectedConstructor(this)
     }
 
-    fun insert() : SQLInserter {
+    fun insert(): SQLInserter {
         return SQLInserter(this)
     }
 
-    fun select() : SQLSelector {
+    fun select(): SQLSelector {
         return SQLSelector(this)
     }
+
+    fun insertRow(vararg args: Any) {
+        insert().with(*args).insert()
+    }
+    
+    fun replaceRow(vararg args: Any) {
+        insert().with(*args).replace()
+    }
+
     class ConnectedConstructor(table: SQLTable) : AbstractQueryable(table) {
         private val lst = mutableListOf<ColumnData>()
         fun with(name: String, type: ISQLStructure<*>, unit: ColumnData.() -> Unit = {}): ConnectedConstructor {

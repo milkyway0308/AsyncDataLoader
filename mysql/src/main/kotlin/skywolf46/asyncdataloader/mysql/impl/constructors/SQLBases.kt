@@ -3,18 +3,16 @@ package skywolf46.asyncdataloader.mysql.impl.constructors
 import skywolf46.asyncdataloader.mysql.abstraction.ISQLStructure
 import skywolf46.asyncdataloader.mysql.abstraction.IStatementInput
 import skywolf46.asyncdataloader.mysql.abstraction.IStatementOutput
-import skywolf46.asyncdataloader.mysql.util.SQLResult
-import java.util.*
 
 sealed class SQLBases<T : Any> : ISQLStructure<T> {
 
     class String(val size: Int) : SQLBases<kotlin.String>() {
         override fun getMark(): kotlin.String {
-            return "S"
+            return "TX"
         }
 
         override fun construct(table: IStatementOutput): kotlin.String {
-            TODO("Not yet implemented")
+            return table.getString()
         }
 
         override fun deconstruct(data: kotlin.String, statement: IStatementInput) {
@@ -35,15 +33,52 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
 
     }
 
+    object Byte : SQLBases<kotlin.Byte>() {
+        override fun getMark(): kotlin.String {
+            return "B"
+        }
+
+        override fun construct(table: IStatementOutput): kotlin.Byte {
+            return table.getByte()
+        }
+
+        override fun deconstruct(data: kotlin.Byte, statement: IStatementInput) {
+            statement.appendByte(data)
+        }
+
+        override fun getConstructor(): kotlin.String {
+            return "TINYINT"
+        }
+    }
+
+    object Short : SQLBases<kotlin.Short>() {
+        override fun getMark(): kotlin.String {
+            return "S"
+        }
+
+        override fun construct(table: IStatementOutput): kotlin.Short {
+            return table.getShort()
+        }
+
+        override fun deconstruct(data: kotlin.Short, statement: IStatementInput) {
+            statement.appendShort(data)
+        }
+
+        override fun getConstructor(): kotlin.String {
+            return "SMALLINT"
+        }
+
+    }
+
 
     object Int : SQLBases<kotlin.Int>() {
         override fun getMark(): kotlin.String {
-            TODO("Not yet implemented")
+            return "I"
         }
 
 
         override fun construct(table: IStatementOutput): kotlin.Int {
-            TODO("Not yet implemented")
+            return table.getInt()
         }
 
         override fun deconstruct(data: kotlin.Int, statement: IStatementInput) {
@@ -56,13 +91,46 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
 
     }
 
+    object Float : SQLBases<kotlin.Float>() {
+        override fun getMark(): kotlin.String {
+            return "F"
+        }
+
+        override fun construct(table: IStatementOutput): kotlin.Float {
+            return table.getFloat()
+        }
+
+        override fun deconstruct(data: kotlin.Float, statement: IStatementInput) {
+            statement.appendFloat(data)
+        }
+    }
+
+    object Long : SQLBases<kotlin.Long>() {
+        override fun getMark(): kotlin.String {
+            return "L"
+        }
+
+        override fun construct(table: IStatementOutput): kotlin.Long {
+            return table.getLong()
+        }
+
+        override fun deconstruct(data: kotlin.Long, statement: IStatementInput) {
+            statement.appendLong(data)
+        }
+
+        override fun getConstructor(): kotlin.String {
+            return "BIGINT"
+        }
+
+    }
+
     object Double : SQLBases<kotlin.Double>() {
         override fun getMark(): kotlin.String {
             return "D"
         }
 
         override fun construct(table: IStatementOutput): kotlin.Double {
-            TODO("Not yet implemented")
+            return table.getDouble()
         }
 
         override fun deconstruct(data: kotlin.Double, statement: IStatementInput) {
@@ -81,7 +149,7 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
         }
 
         override fun construct(table: IStatementOutput): java.util.UUID {
-            TODO("Not yet implemented")
+            return java.util.UUID.fromString(table.getString())
         }
 
         override fun deconstruct(data: java.util.UUID, statement: IStatementInput) {
@@ -90,6 +158,20 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
 
         override fun getConstructor(): kotlin.String {
             return "VARCHAR(36)"
+        }
+    }
+
+    object ByteArray : SQLBases<kotlin.ByteArray>() {
+        override fun getMark(): kotlin.String {
+            return "BA"
+        }
+
+        override fun construct(table: IStatementOutput): kotlin.ByteArray {
+            return table.getByteArray()
+        }
+
+        override fun deconstruct(data: kotlin.ByteArray, statement: IStatementInput) {
+            statement.appendByteArray(data)
         }
 
     }

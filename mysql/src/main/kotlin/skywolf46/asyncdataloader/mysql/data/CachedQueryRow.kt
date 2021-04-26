@@ -21,31 +21,35 @@ class CachedQueryRow : IStatementOutput {
     }
 
     override fun getShort(): Short {
-        TODO("Not yet implemented")
+        return lst[cursor++] as Short
     }
 
     override fun getInt(): Int {
-        TODO("Not yet implemented")
+        return lst[cursor++] as Int
     }
 
     override fun getLong(): Long {
-        TODO("Not yet implemented")
+        return lst[cursor++] as Long
     }
 
     override fun getFloat(): Float {
-        TODO("Not yet implemented")
+        return lst[cursor++] as Float
     }
 
     override fun getDouble(): Double {
-        TODO("Not yet implemented")
+        return lst[cursor++] as Double
     }
 
     override fun getByteArray(): ByteArray {
-        TODO("Not yet implemented")
+        return lst[cursor++] as ByteArray
     }
 
     override fun getByteArrayWithoutFilter(): ByteArray {
-        TODO("Not yet implemented")
+        return lst[cursor++] as ByteArray
+    }
+
+    override fun getString(): String {
+        return lst[cursor++] as String
     }
 
     override fun appendFilter(filter: IByteFilter): IStatementOutput {
@@ -53,15 +57,15 @@ class CachedQueryRow : IStatementOutput {
     }
 
     override fun <T : Any> get(const: ISQLStructure<T>): T {
-        TODO("Not yet implemented")
+        return lst[cursor++] as T
     }
 
     override fun <T : Any> get(cls: KClass<T>): T {
-        TODO("Not yet implemented")
+        return lst[cursor++] as T
     }
 
     override fun <T : Any> get(cls: Class<T>): T {
-        TODO("Not yet implemented")
+        return lst[cursor++] as T
     }
 
     override fun toResultInjector(): ResultInjector {
@@ -72,8 +76,12 @@ class CachedQueryRow : IStatementOutput {
         return this
     }
 
-    override fun close() {
+    override fun cache(unit: IStatementOutput.() -> Unit): CachedQueryRow {
         TODO("Not yet implemented")
+    }
+
+    override fun close() {
+
     }
 
 }

@@ -77,13 +77,20 @@ class ResultInjector(private val main: ResultSet) : ResultSet, IStatementOutput 
             cache?.lst?.add(FilterReady(filters, data))
         else
             filters.forEach {
-                data = it.filterSync(data)
+                data = it.filterDecodeSync(data)
             }
         return data
     }
 
     override fun getByteArrayWithoutFilter(): ByteArray {
         val data = getBytes(pointer++)
+        if (cache != null)
+            cache?.lst?.add(data)
+        return data
+    }
+
+    override fun getString(): String {
+        val data = getString(pointer++)
         if (cache != null)
             cache?.lst?.add(data)
         return data
@@ -126,7 +133,7 @@ class ResultInjector(private val main: ResultSet) : ResultSet, IStatementOutput 
         return this
     }
 
-    fun cache(unit: IStatementOutput.() -> Unit): CachedQueryRow {
+    override fun cache(unit: IStatementOutput.() -> Unit): CachedQueryRow {
         cache = CachedQueryRow()
         unit(this)
         val c = cache

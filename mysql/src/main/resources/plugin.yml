@@ -1,6 +1,6 @@
 name: AsyncDataLoader-MySQL
 version: 1.0
-main: skywolf46.asyncdataloader.mysql.AsyncDataLoader
+main: skywolf46.asyncdataloader.mysql.MySQLDataLoader
 depend:
   - SkywolfExtraUtility
   - AsyncDataLoader-Core

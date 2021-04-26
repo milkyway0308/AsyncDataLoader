@@ -657,7 +657,7 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
         for (x in filters) {
             if (ignoredFilter.contains(x))
                 continue
-            array = x.filter(array, this)
+            array = x.filterEncode(array, this)
             if (isCancelled) {
                 val runner = mutableListOf<IStatementInput.() -> Unit>()
                 runner.addAll(runList)

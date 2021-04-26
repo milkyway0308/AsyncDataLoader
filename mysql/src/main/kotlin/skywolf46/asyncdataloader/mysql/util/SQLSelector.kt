@@ -1,10 +1,8 @@
-package skywolf46.asyncdataloader.mysql.impl
+package skywolf46.asyncdataloader.mysql.util
 
 import skywolf46.asyncdataloader.mysql.abstraction.AbstractQueryable
 import skywolf46.asyncdataloader.mysql.abstraction.ISQLStructure
 import skywolf46.asyncdataloader.mysql.storage.SQLStructureStorage
-import skywolf46.asyncdataloader.mysql.util.SQLTable
-import skywolf46.asyncdataloader.mysql.util.StatementInjector
 
 class SQLSelector(table: SQLTable) : AbstractQueryable(table) {
     private val sqlSelect: MutableList<Pair<ISQLStructure<Any>, String>> = mutableListOf()
