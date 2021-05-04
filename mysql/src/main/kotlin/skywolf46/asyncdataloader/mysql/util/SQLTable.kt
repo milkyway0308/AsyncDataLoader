@@ -1,6 +1,8 @@
 package skywolf46.asyncdataloader.mysql.util
 
 import skywolf46.asyncdataloader.mysql.abstraction.AbstractQueryable
+import skywolf46.asyncdataloader.mysql.abstraction.IBatchAcceptor
+import skywolf46.asyncdataloader.mysql.abstraction.IBatchController
 import skywolf46.asyncdataloader.mysql.abstraction.ISQLStructure
 import java.sql.Connection
 
@@ -8,7 +10,6 @@ class SQLTable(val connection: Connection?, val tableName: String) {
 
     @Deprecated("This constructor only allowed for testing")
     internal constructor(str: String) : this(null, str)
-
 
     //    fun prepare(sql: ISQLConvertible) = connection?.prepareStatement(sql.toSQLString())
     fun construct(): ConnectedConstructor {
@@ -23,12 +24,30 @@ class SQLTable(val connection: Connection?, val tableName: String) {
         return SQLSelector(this)
     }
 
+    fun delete(): SQLDeleter {
+        return SQLDeleter(this)
+    }
+
     fun insertRow(vararg args: Any) {
         insert().with(*args).insert()
     }
-    
+
     fun replaceRow(vararg args: Any) {
         insert().with(*args).replace()
+    }
+
+
+    fun deleteBatch(unit: IBatchAcceptor.() -> Unit) {
+        unit(delete().batch())
+    }
+
+    fun insertBatch(unit: IBatchAcceptor.() -> Unit) {
+        unit(insert().batchInsert())
+    }
+
+
+    fun replaceBatch(unit: IBatchAcceptor.() -> Unit) {
+        unit(insert().batchReplace())
     }
 
     class ConnectedConstructor(table: SQLTable) : AbstractQueryable(table) {

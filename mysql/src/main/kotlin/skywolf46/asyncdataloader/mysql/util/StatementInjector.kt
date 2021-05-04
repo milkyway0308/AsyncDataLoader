@@ -706,16 +706,22 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
             append(objs[index++])
         }
         unit(this)
-        revoker?.let {
-            executeQuery().run {
-                try {
-                    it(ResultInjector(this))
-                } catch (_: Exception) {
+        if (!isBatch) {
+            revoker?.let {
+                executeQuery().run {
+                    try {
+                        it(ResultInjector(this))
+                    } catch (_: Exception) {
+                    }
+                    if (!isClosed)
+                        close()
                 }
-                if (!isClosed)
-                    close()
-            }
-        } ?: execute()
+            } ?: execute()
+            finalizer?.invoke()
+        } else {
+            // Batch not support revoker
+            addBatch()
+        }
     }
 
     // TODO remove it
@@ -762,29 +768,52 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
         return this
     }
 
+    override fun resetIfNotExists(unit: IStatementInput.() -> Unit): IStatementInput {
+        if (main == null)
+            reset(unit)
+        return this
+    }
+
     override fun getSQL(): String {
         return sql
     }
 
+    private var isBatch = false
     private var index = 0
     private var objs = mutableListOf<Any>()
     private var revoker: (IStatementOutput.() -> Unit)? = null
+    private var finalizer: (() -> Unit)? = null
     override fun executeQuery(obj: MutableList<Any>, unit: IStatementOutput.() -> Unit) {
         reset { }
+        isBatch = false
         index = 0
         objs = obj
         revoker = unit
         revokeTask()
-        // TODO add unit call
     }
 
-    override fun execute(obj: MutableList<Any>) {
+    override fun execute(obj: MutableList<Any>, unit: (() -> Unit)?) {
         reset { }
+        isBatch = false
+        index = 0
+        objs = obj
+        revoker = null
+        finalizer = unit
+        revokeTask()
+    }
+
+    override fun batch(obj: MutableList<Any>) {
+        resetIfNotExists { }
+        isBatch = true
         index = 0
         objs = obj
         revoker = null
         revokeTask()
-        // TODO add unit call
     }
+
+    override fun finalizeBatch() {
+        executeBatch()
+    }
+
 
 }

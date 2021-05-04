@@ -77,8 +77,18 @@ interface IStatementInput {
      */
     fun reset(unit: IStatementInput.() -> Unit) : IStatementInput
 
+    /**
+     * Reset statement if not initialized.
+     */
+    fun resetIfNotExists(unit: IStatementInput.() -> Unit) : IStatementInput
+
     fun getSQL(): String
 
     fun executeQuery(obj: MutableList<Any>, unit: IStatementOutput.() -> Unit)
-    fun execute(obj: MutableList<Any>)
+
+    fun execute(obj: MutableList<Any>, unit: (() -> Unit)? = null)
+
+    fun batch(obj: MutableList<Any>)
+
+    fun finalizeBatch()
 }

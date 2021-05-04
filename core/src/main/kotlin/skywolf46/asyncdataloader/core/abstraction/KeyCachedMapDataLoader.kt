@@ -7,9 +7,15 @@ abstract class KeyCachedMapDataLoader<K, V> : AbstractDataLoader<KeyCachedMapDat
     private val modified = mutableSetOf<K>()
 
     operator fun set(k: K, v: V) {
-        modified += k
+        set(k, v, true)
+    }
+
+    fun set(k: K, v: V, save: Boolean = true) {
         data[k] = v
-        reserveSave()
+        if (save) {
+            modified += k
+            reserveSave()
+        }
     }
 
     fun remove(k: K) {
@@ -30,10 +36,21 @@ abstract class KeyCachedMapDataLoader<K, V> : AbstractDataLoader<KeyCachedMapDat
         return map
     }
 
-    fun getModifiedContents(clearCache: Boolean = true): Map<K, V?> {
-        val map = mutableMapOf<K, V?>()
-        for (x in getModified())
-            map[x] = data[x]
-        return map
+    fun cloneMap(): Map<K, V> = HashMap(data)
+
+    fun getModifiedContents(clearCache: Boolean = true): Pair<List<K>, Map<K, V>> {
+        val map = mutableMapOf<K, V>()
+        val removed = mutableListOf<K>()
+        for (x in modified) {
+            if (!data.containsKey(x)) {
+                removed += x
+            } else {
+                map[x] = data[x]!!
+            }
+        }
+        if (clearCache) {
+            modified.clear()
+        }
+        return removed to map
     }
 }

@@ -1,6 +1,8 @@
 package skywolf46.asyncdataloader.mysql.util
 
 import skywolf46.asyncdataloader.mysql.abstraction.AbstractQueryable
+import skywolf46.asyncdataloader.mysql.abstraction.IBatchAcceptor
+import skywolf46.asyncdataloader.mysql.abstraction.IBatchController
 import skywolf46.asyncdataloader.mysql.storage.SQLStructureStorage
 
 class SQLInserter(table: SQLTable) : AbstractQueryable(table) {
@@ -42,4 +44,44 @@ class SQLInserter(table: SQLTable) : AbstractQueryable(table) {
         injector.asStatementInput().execute(lst)
         return injector
     }
+
+    fun batchInsert(): IBatchAcceptor {
+        val ns = SQLInserter(table)
+        return object : IBatchController {
+            private var injector: StatementInjector? = null
+            override fun accept(vararg any: Any): IBatchAcceptor {
+                if (injector == null) {
+                    ns.with(any)
+                    injector = StatementInjector(table, "insert ${ns.getSQLString()}")
+                }
+                injector!!.batch(mutableListOf(*any))
+                return this
+            }
+
+            override fun finalizeBatch() {
+                injector?.finalizeBatch()
+            }
+        }
+    }
+
+
+    fun batchReplace(): IBatchAcceptor {
+        val ns = SQLInserter(table)
+        return object : IBatchController {
+            private var injector: StatementInjector? = null
+            override fun accept(vararg any: Any): IBatchAcceptor {
+                if (injector == null) {
+                    ns.with(any)
+                    injector = StatementInjector(table, "replace ${ns.getSQLString()}")
+                }
+                injector!!.batch(mutableListOf(*any))
+                return this
+            }
+
+            override fun finalizeBatch() {
+                injector?.finalizeBatch()
+            }
+        }
+    }
+
 }
