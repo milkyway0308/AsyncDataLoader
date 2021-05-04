@@ -1,6 +1,5 @@
 package skywolf46.asyncdataloader.mysql.abstraction
 
-import skywolf46.asyncdataloader.mysql.util.SQLResult
 import skywolf46.asyncdataloader.mysql.util.StatementInjector
 
 interface IStatementInput {
