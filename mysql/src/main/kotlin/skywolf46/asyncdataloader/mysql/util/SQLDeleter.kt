@@ -1,9 +1,6 @@
 package skywolf46.asyncdataloader.mysql.util
 
-import skywolf46.asyncdataloader.mysql.abstraction.AbstractQueryable
-import skywolf46.asyncdataloader.mysql.abstraction.IBatchAcceptor
-import skywolf46.asyncdataloader.mysql.abstraction.IBatchController
-import skywolf46.asyncdataloader.mysql.abstraction.ISQLStructure
+import skywolf46.asyncdataloader.mysql.abstraction.*
 import skywolf46.asyncdataloader.mysql.storage.SQLStructureStorage
 
 class SQLDeleter(table: SQLTable) : AbstractQueryable(table) {
@@ -35,28 +32,31 @@ class SQLDeleter(table: SQLTable) : AbstractQueryable(table) {
     }
 
 
-    fun <T : Any> delete(unit: () -> Unit = {}): StatementInjector {
+    fun delete(unit: () -> Unit = {}): StatementInjector {
         val inject = StatementInjector(table, getSQLString())
         inject.asStatementInput().execute(getSQLObjects().toMutableList(), unit)
         return inject
     }
 
-    fun batch(): IBatchAcceptor {
-        val ns = SQLInserter(table)
-        return object : IBatchController {
+    fun batch(): ISQLController {
+        val ns = SQLDeleter(table)
+        return object : ISQLController {
             private var injector: StatementInjector? = null
-            override fun accept(vararg any: Any): IBatchAcceptor {
+
+            override fun accept(vararg pair: Pair<String, Any>): ISQLCompare {
                 if (injector == null) {
-                    ns.with(any)
+                    for ((x, y) in pair)
+                        ns.compareWith(x, y)
                     injector = StatementInjector(table, ns.getSQLString())
                 }
-                injector!!.batch(mutableListOf(*any))
+                injector!!.batch(mutableListOf(*pair.map { (_, y) -> y }.toTypedArray()))
                 return this
             }
 
             override fun finalizeBatch() {
                 injector?.finalizeBatch()
             }
+
         }
     }
 

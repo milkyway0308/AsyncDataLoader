@@ -1,9 +1,6 @@
 package skywolf46.asyncdataloader.mysql.util
 
-import skywolf46.asyncdataloader.mysql.abstraction.AbstractQueryable
-import skywolf46.asyncdataloader.mysql.abstraction.IBatchAcceptor
-import skywolf46.asyncdataloader.mysql.abstraction.IBatchController
-import skywolf46.asyncdataloader.mysql.abstraction.ISQLStructure
+import skywolf46.asyncdataloader.mysql.abstraction.*
 import java.sql.Connection
 
 class SQLTable(val connection: Connection?, val tableName: String) {
@@ -36,8 +33,15 @@ class SQLTable(val connection: Connection?, val tableName: String) {
         insert().with(*args).replace()
     }
 
+    fun deleteRow(vararg arg: Pair<String, Any>, unit: () -> Unit = {}) {
+        delete().run {
+            for ((x, y) in arg)
+                compareWith(x, y)
+            delete(unit)
+        }
+    }
 
-    fun deleteBatch(unit: IBatchAcceptor.() -> Unit) {
+    fun deleteBatch(unit: ISQLCompare.() -> Unit) {
         unit(delete().batch())
     }
 

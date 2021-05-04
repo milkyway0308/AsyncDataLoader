@@ -716,7 +716,11 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
                     if (!isClosed)
                         close()
                 }
-            } ?: execute()
+            } ?: run {
+                execute()
+                if (!isClosed)
+                    close()
+            }
             finalizer?.invoke()
         } else {
             // Batch not support revoker
