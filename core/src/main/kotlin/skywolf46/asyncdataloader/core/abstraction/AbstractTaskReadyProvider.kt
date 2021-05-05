@@ -8,7 +8,8 @@ abstract class AbstractTaskReadyProvider {
         var defaultTask: AbstractTaskReadyProvider? = null
     }
 
-    abstract fun doAsync(snapshot: () -> Unit)
+    // If true, system is finalizing.
+    abstract fun doAsync(snapshot: (Boolean) -> Unit)
     abstract fun registerTask(provider: DataCounter<AbstractDataLoader<Any>>)
-
+    abstract fun finalizeProvider()
 }

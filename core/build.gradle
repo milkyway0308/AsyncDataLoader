@@ -35,6 +35,7 @@ jar {
 }
 
 processResources {
+    outputs.upToDateWhen { false }
     filesMatching(["loaderDeclaration.properties", "plugin.yml"]*.toString()) {
         expand(["version": rootProject.properties["version"] as String])
     }

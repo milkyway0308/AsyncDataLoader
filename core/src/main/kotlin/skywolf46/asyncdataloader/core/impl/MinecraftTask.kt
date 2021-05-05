@@ -6,10 +6,11 @@ import skywolf46.asyncdataloader.core.abstraction.AbstractTaskReadyProvider
 import skywolf46.asyncdataloader.core.abstraction.data.DataCounter
 import skywolf46.asyncdataloader.core.abstraction.loader.AbstractDataLoader
 
+@Deprecated("Unstable shutdown")
 object MinecraftTask : AbstractTaskReadyProvider() {
-    override fun doAsync(snapshot: () -> Unit) {
+    override fun doAsync(snapshot: (Boolean) -> Unit) {
         Bukkit.getScheduler().runTaskAsynchronously(AsyncDataLoader.inst) {
-            snapshot()
+            snapshot(false)
         }
     }
 
@@ -22,7 +23,7 @@ object MinecraftTask : AbstractTaskReadyProvider() {
                     val snapshotReady = provider.data.snapshot()
                     provider.data.task = null
                     doAsync {
-                        snapshotReady.trigger()
+                        snapshotReady.trigger(false)
                     }
                 }
             }, 20L, 20L
@@ -30,5 +31,9 @@ object MinecraftTask : AbstractTaskReadyProvider() {
         provider.currentTask = {
             Bukkit.getScheduler().cancelTask(id)
         }
+    }
+
+    override fun finalizeProvider() {
+
     }
 }

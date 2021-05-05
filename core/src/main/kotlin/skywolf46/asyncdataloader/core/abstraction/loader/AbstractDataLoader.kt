@@ -45,7 +45,7 @@ abstract class AbstractDataLoader<T : Any> : IDataQueueable<T> {
     }
 
     fun forceSave() {
-        snapshot().trigger()
+        snapshot().trigger(false)
     }
 
 

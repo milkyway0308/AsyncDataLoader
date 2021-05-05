@@ -20,12 +20,15 @@ class SQLSelector(table: SQLTable) : AbstractQueryable(table) {
             sb.append("${x.first.toSQLSelectString(x.second).first}, ")
         }
         sb.delete(sb.length - 2, sb.length)
-        sb.append(" from ${table.tableName} where ")
-        for (x in sqlCompare) {
-            sb.append("${x.first.toSQLEqualString(x.second).first}, ")
+        sb.append(" from ${table.tableName}")
+        if (sqlCompare.size != 0) {
+            sb.append(" where ")
+            for (x in sqlCompare) {
+                sb.append("${x.first.toSQLEqualString(x.second).first}, ")
+            }
+            sb.delete(sb.length - 2, sb.length)
+            sb.append(";")
         }
-        sb.delete(sb.length - 2, sb.length)
-        sb.append(";")
         return sb.toString()
     }
 
@@ -46,30 +49,65 @@ class SQLSelector(table: SQLTable) : AbstractQueryable(table) {
         return this
     }
 
-    fun <T : Any> selectOne(target: String, struct: ISQLStructure<T>, unit: T?.() -> Unit): StatementInjector {
+    fun <T : Any> selectOne(target: Pair<String, ISQLStructure<T>>, unit: T?.() -> Unit): StatementInjector {
         sqlSelect.clear()
-        selectAt(target, struct)
+        selectAt(target.first, target.second)
         val inject = StatementInjector(table, getSQLString())
         inject.asStatementInput().executeQuery(getSQLObjects().toMutableList()) {
-            unit(if (toResultInjector().hasValue) get(struct)!! else null)
+            unit(if (toResultInjector().hasValue) get(target.second)!! else null)
         }
         return inject
     }
 
 
-    fun <T : Any> selectAll(target: String, struct: ISQLStructure<T>, unit: List<T>?.() -> Unit): StatementInjector {
+    fun <T : Any> selectAll(target: Pair<String, ISQLStructure<T>>, unit: List<T>?.() -> Unit): StatementInjector {
         sqlSelect.clear()
-        selectAt(target, struct)
+        selectAt(target.first, target.second)
         val inject = StatementInjector(table, getSQLString())
         inject.asStatementInput().executeQuery(getSQLObjects().toMutableList()) {
             val lst = mutableListOf<T>()
             while (toResultInjector().next()) {
-                lst.add(get(struct)!!)
+                lst.add(get(target.second)!!)
             }
             unit(lst)
         }
         return inject
     }
 
+
+    fun <T : Any, X : Any> selectOneKey(
+        key: Pair<String, ISQLStructure<T>>,
+        value: Pair<String, ISQLStructure<X>>,
+        unit: Pair<T, X>?.() -> Unit,
+    ): StatementInjector {
+        sqlSelect.clear()
+        selectAt(key.first, key.second)
+        selectAt(value.first, value.second)
+        val inject = StatementInjector(table, getSQLString())
+        inject.asStatementInput().executeQuery(getSQLObjects().toMutableList()) {
+            unit(if (toResultInjector().hasValue) get(key.second)!! to get(value.second)!! else null)
+        }
+        return inject
+    }
+
+
+    fun <T : Any, X : Any> selectAllKey(
+        key: Pair<String, ISQLStructure<T>>,
+        value: Pair<String, ISQLStructure<X>>,
+        unit: List<Pair<T, X>>?.() -> Unit,
+    ): StatementInjector {
+        sqlSelect.clear()
+        selectAt(key.first, key.second)
+        selectAt(value.first, value.second)
+        val inject = StatementInjector(table, getSQLString())
+        inject.asStatementInput().executeQuery(getSQLObjects().toMutableList()) {
+            val lst = mutableListOf<Pair<T, X>>()
+            while (toResultInjector().next()) {
+                lst.add(get(key.second)!! to get(value.second)!!)
+            }
+            unit(lst)
+        }
+        return inject
+    }
 
 }

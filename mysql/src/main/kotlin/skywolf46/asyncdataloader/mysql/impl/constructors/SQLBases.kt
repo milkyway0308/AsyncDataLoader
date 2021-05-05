@@ -6,7 +6,7 @@ import skywolf46.asyncdataloader.mysql.abstraction.IStatementOutput
 
 sealed class SQLBases<T : Any> : ISQLStructure<T> {
 
-    class String(val size: Int) : SQLBases<kotlin.String>() {
+    class String(val size: kotlin.Int) : SQLBases<kotlin.String>() {
         override fun getMark(): kotlin.String {
             return "TX"
         }

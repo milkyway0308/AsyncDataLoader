@@ -26,11 +26,29 @@ class SQLBasedRequester(private val conn: Connection) : AbstractDataLoadRequeste
     }
 }
 
-fun <T : AbstractDataLoader<*>> T.loadSQL(connection: Connection = MySQLLoaderInitializer.pool.connection, table: String, unit: SQLTable.() -> Unit) {
+fun <T : AbstractDataLoader<*>> T.loadSQL(
+    connection: Connection = MySQLLoaderInitializer.pool!!.connection,
+    table: String,
+    unit: SQLTable.() -> Unit,
+) {
     this.loadRequest(SQLBasedRequester(connection), table, unit)
 }
 
 
-fun <T : AbstractDataLoader<*>> T.loadSQLAsync(connection: Connection = MySQLLoaderInitializer.pool.connection, table: String, unit: SQLTable.() -> Unit) {
+fun <T : AbstractDataLoader<*>> T.loadSQLAsync(
+    connection: Connection = MySQLLoaderInitializer.pool!!.connection,
+    table: String,
+    unit: SQLTable.() -> Unit,
+) {
     this.asyncLoadRequest(SQLBasedRequester(connection), table, unit)
+}
+
+
+fun <T : AbstractDataLoader<*>> T.loadSQL(table: String, unit: SQLTable.() -> Unit) {
+    this.loadSQL(table, unit)
+}
+
+
+fun <T : AbstractDataLoader<*>> T.loadSQLAsync(table: String, unit: SQLTable.() -> Unit) {
+    this.loadSQLAsync(table, unit)
 }

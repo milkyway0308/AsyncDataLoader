@@ -17,8 +17,11 @@ import java.util.*
 class MySQLLoaderInitializer : AbstractDataLoaderInitializer() {
     companion object {
         var targetFile = File("mySQL.properties")
-        lateinit var account: SQLAccount
-        lateinit var pool: HikariDataSource
+        internal lateinit var account: SQLAccount
+        var pool: HikariDataSource? = null
+        fun isInitialized(): Boolean {
+            return pool != null
+        }
     }
 
     override fun load() {
@@ -31,7 +34,7 @@ class MySQLLoaderInitializer : AbstractDataLoaderInitializer() {
         println("AsyncDataLoader - MySQL | Loading configuration...")
         with(targetFile) {
             val property = Properties()
-            property["url"] = "jdbc:mysql://localhost:3306/"
+            property["url"] = "jdbc:mysql://localhost:3306/?useSSL=false"
             property["user"] = "root"
             property["password"] = "1111"
             if (!exists()) {
@@ -45,18 +48,31 @@ class MySQLLoaderInitializer : AbstractDataLoaderInitializer() {
                 SQLAccount(property["url"].toString(), property["user"].toString(), property["password"].toString())
         }
         println("AsyncDataLoader - MySQL | Creating SQL thread pool...")
-        val config = HikariConfig()
-        config.jdbcUrl = account.url
-        config.username = account.id
-        config.password = account.password
-        config.driverClassName = "com.mysql.jdbc.Driver"
-        config.addDataSourceProperty("cachePrepStmts", "true")
-        config.addDataSourceProperty("prepStmtCacheSize", "250")
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
         try {
+            val config = HikariConfig()
+            println(account.url)
+            config.jdbcUrl = account.url
+            config.username = account.id
+            config.password = account.password
+            config.driverClassName = "com.mysql.jdbc.Driver"
+
+            config.addDataSourceProperty("cachePrepStmts", "true")
+            config.addDataSourceProperty("prepStmtCacheSize", "250")
+            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
+            config.addDataSourceProperty("useServerPrepStmts", "true")
+            config.addDataSourceProperty("useLocalSessionState", "true")
+            config.addDataSourceProperty("rewriteBatchedStatements", "true")
+            config.addDataSourceProperty("cacheResultSetMetadata", "true")
+            config.addDataSourceProperty("cacheServerConfiguration", "true")
+            config.addDataSourceProperty("elideSetAutoCommits", "true")
+            config.addDataSourceProperty("maintainTimeStats", "false")
+            config.addDataSourceProperty("server.ssl.enabled", "false")
+
             pool = HikariDataSource(config)
+            System.err.println("AsyncDataLoader - MySQL | SQL connected sucessfully.")
         } catch (e: Exception) {
             System.err.println("AsyncDataLoader - MySQL | SQL Connection failed! Check setting in file \"mysql.properties\" and retry.")
+            e.printStackTrace()
         }
 
     }

@@ -4,5 +4,5 @@ import skywolf46.asyncdataloader.core.abstraction.AbstractDataProvider
 import kotlin.reflect.KClass
 
 abstract class AbstractDataSnapshot() {
-    abstract fun trigger()
+    abstract fun trigger(isFinalizing: Boolean)
 }
