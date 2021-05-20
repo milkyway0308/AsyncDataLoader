@@ -3,14 +3,14 @@ package skywolf46.asyncdataloader.core.abstraction
 import skywolf46.asyncdataloader.core.abstraction.loader.AbstractDataLoader
 
 abstract class KeyCachedMapDataLoader<K, V> : AbstractDataLoader<KeyCachedMapDataLoader<K, V>>() {
-    private val data = mutableMapOf<K, V>()
+    private val data = LinkedHashMap<K, V>()
     private val modified = mutableSetOf<K>()
 
-    operator fun set(k: K, v: V) {
+    open operator fun set(k: K, v: V) {
         set(k, v, true)
     }
 
-    fun set(k: K, v: V, save: Boolean = true) {
+    open fun set(k: K, v: V, save: Boolean = true) {
         data[k] = v
         if (save) {
             modified += k
@@ -18,11 +18,13 @@ abstract class KeyCachedMapDataLoader<K, V> : AbstractDataLoader<KeyCachedMapDat
         }
     }
 
-    fun remove(k: K) {
+    open fun remove(k: K) {
         modified += k
     }
 
-    operator fun get(k: K) = data[k]
+    open operator fun get(k: K) = data[k]
+
+    open fun has(k: K) = data.containsKey(k)
 
     fun keyset() = data.keys
 
