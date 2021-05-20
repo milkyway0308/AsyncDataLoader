@@ -73,6 +73,7 @@ sealed class SQLBases<T : Any> : ISQLStructure<T> {
 
     object Int : SQLBases<kotlin.Int>() {
         override fun getMark(): kotlin.String {
+            
             return "I"
         }
 
