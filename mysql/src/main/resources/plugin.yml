@@ -4,3 +4,5 @@ main: skywolf46.asyncdataloader.mysql.MySQLDataLoader
 depend:
   - SkywolfExtraUtility
   - AsyncDataLoader-Core
+softdepend:
+  - AsyncDataLoader-File

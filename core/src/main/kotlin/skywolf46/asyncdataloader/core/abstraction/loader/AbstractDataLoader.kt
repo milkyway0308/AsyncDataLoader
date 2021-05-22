@@ -12,6 +12,10 @@ abstract class AbstractDataLoader<T : Any> : IDataQueueable<T> {
     protected val loaded = AtomicReference(LoadState.READY)
     private val cache: MutableList<(Any) -> Unit> = mutableListOf()
 
+    fun getLoadState(): LoadState = loaded.get()
+
+    fun isLoaded() = getLoadState().isLoadedState
+
     abstract fun snapshot(): AbstractDataSnapshot
 
     operator fun invoke(unit: T.() -> Unit) {

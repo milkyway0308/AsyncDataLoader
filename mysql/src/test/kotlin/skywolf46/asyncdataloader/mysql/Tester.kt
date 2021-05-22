@@ -96,9 +96,9 @@ class Tester {
             .create()
         table.select()
             .compareWith("playerUID", testUUID)
-            .selectOne("location", SQLMinecraft.Vector) {
-                println("Selected $this")
-            }
+//            .selectOne("location", SQLMinecraft.Vector) {
+//                println("Selected $this")
+//            }
     }
 
 

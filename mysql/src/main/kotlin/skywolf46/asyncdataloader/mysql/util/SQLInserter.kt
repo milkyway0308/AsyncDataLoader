@@ -7,6 +7,7 @@ import skywolf46.asyncdataloader.mysql.storage.SQLStructureStorage
 
 class SQLInserter(table: SQLTable) : AbstractQueryable(table) {
     private val lst = mutableListOf<Any>()
+
     fun with(vararg obj: Any): SQLInserter {
         for (x in obj)
             lst.add(x)
@@ -21,7 +22,8 @@ class SQLInserter(table: SQLTable) : AbstractQueryable(table) {
                 for (i in 0 until structure.count()) {
                     sb.append("?, ")
                 }
-            } ?: throw IllegalStateException("SQL deserialization for ${x.javaClass.name} not supported")
+            }
+                ?: throw IllegalStateException("SQL deserialization for ${x.javaClass.kotlin.qualifiedName} not supported")
         }
         sb.delete(sb.length - 2, sb.length)
         sb.append(");")
@@ -51,7 +53,7 @@ class SQLInserter(table: SQLTable) : AbstractQueryable(table) {
             private var injector: StatementInjector? = null
             override fun accept(vararg any: Any): IBatchAcceptor {
                 if (injector == null) {
-                    ns.with(any)
+                    ns.with(*any)
                     injector = StatementInjector(table, "insert ${ns.getSQLString()}")
                 }
                 injector!!.batch(mutableListOf(*any))
@@ -71,7 +73,7 @@ class SQLInserter(table: SQLTable) : AbstractQueryable(table) {
             private var injector: StatementInjector? = null
             override fun accept(vararg any: Any): IBatchAcceptor {
                 if (injector == null) {
-                    ns.with(any)
+                    ns.with(*any)
                     injector = StatementInjector(table, "replace ${ns.getSQLString()}")
                 }
                 injector!!.batch(mutableListOf(*any))

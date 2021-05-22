@@ -13,7 +13,12 @@ import java.sql.Date
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 
-class StatementInjector(val table: SQLTable, private val sql: String) : PreparedStatement, IStatementInput {
+class StatementInjector(val table: SQLTable, private var sql: String) : PreparedStatement, IStatementInput {
+    init {
+        if (sql.endsWith(";"))
+            sql = sql.substring(0, sql.length - 1)
+    }
+
     private var currentCursor = 1
     private var isWarned = false
     private var filters = mutableListOf<IByteFilter>()
@@ -701,8 +706,9 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
 
     override fun revokeTask(unit: IStatementInput.() -> Unit) {
         while (index < objs.size) {
-            if (isCancelled)
+            if (isCancelled) {
                 return
+            }
             append(objs[index++])
         }
         unit(this)
@@ -787,10 +793,12 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
     private var objs = mutableListOf<Any>()
     private var revoker: (IStatementOutput.() -> Unit)? = null
     private var finalizer: (() -> Unit)? = null
+
     override fun executeQuery(obj: MutableList<Any>, unit: IStatementOutput.() -> Unit) {
         reset { }
         isBatch = false
         index = 0
+        currentCursor = 1
         objs = obj
         revoker = unit
         revokeTask()
@@ -800,6 +808,7 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
         reset { }
         isBatch = false
         index = 0
+        currentCursor = 1
         objs = obj
         revoker = null
         finalizer = unit
@@ -810,6 +819,7 @@ class StatementInjector(val table: SQLTable, private val sql: String) : Prepared
         resetIfNotExists { }
         isBatch = true
         index = 0
+        currentCursor = 1
         objs = obj
         revoker = null
         revokeTask()

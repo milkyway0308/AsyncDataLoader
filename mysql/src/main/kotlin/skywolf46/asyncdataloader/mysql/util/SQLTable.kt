@@ -1,12 +1,13 @@
 package skywolf46.asyncdataloader.mysql.util
 
 import skywolf46.asyncdataloader.mysql.abstraction.*
+import skywolf46.asyncdataloader.mysql.initializer.MySQLLoaderInitializer
 import java.sql.Connection
 
-class SQLTable(val connection: Connection?, val tableName: String) {
+class SQLTable(val tableName: String, val connection: Connection? = MySQLLoaderInitializer.connection().conn) {
 
     @Deprecated("This constructor only allowed for testing")
-    internal constructor(str: String) : this(null, str)
+    internal constructor(str: String) : this(str, null)
 
     //    fun prepare(sql: ISQLConvertible) = connection?.prepareStatement(sql.toSQLString())
     fun construct(): ConnectedConstructor {
@@ -21,8 +22,20 @@ class SQLTable(val connection: Connection?, val tableName: String) {
         return SQLSelector(this)
     }
 
+    fun select(unit: SQLSelector.() -> Unit): SQLSelector {
+        val sel = select()
+        unit(sel)
+        return sel
+    }
+
     fun delete(): SQLDeleter {
         return SQLDeleter(this)
+    }
+
+    fun delete(unit: SQLDeleter.() -> Unit): SQLDeleter {
+        val del = delete()
+        unit(del)
+        return del
     }
 
     fun insertRow(vararg args: Any) {
@@ -42,16 +55,22 @@ class SQLTable(val connection: Connection?, val tableName: String) {
     }
 
     fun deleteBatch(unit: ISQLCompare.() -> Unit) {
-        unit(delete().batch())
+        val batch = delete().batch()
+        unit(batch)
+        (batch as IBatchController).finalizeBatch()
     }
 
     fun insertBatch(unit: IBatchAcceptor.() -> Unit) {
-        unit(insert().batchInsert())
+        val batch = insert().batchInsert()
+        unit(batch)
+        (batch as IBatchController).finalizeBatch()
     }
 
 
     fun replaceBatch(unit: IBatchAcceptor.() -> Unit) {
-        unit(insert().batchReplace())
+        val batch = insert().batchReplace()
+        unit(batch)
+        (batch as IBatchController).finalizeBatch()
     }
 
     class ConnectedConstructor(table: SQLTable) : AbstractQueryable(table) {

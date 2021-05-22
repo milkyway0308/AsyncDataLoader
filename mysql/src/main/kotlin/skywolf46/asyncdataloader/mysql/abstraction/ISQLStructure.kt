@@ -63,8 +63,6 @@ interface ISQLStructure<T : Any> {
     }
 
     fun toSQLEqualString(baseName: String): Pair<String, Int> {
-        println("Base: $baseName")
-        println("ToSQL: ${toSQLCompareString(baseName, "= ?", -1)}")
         return toSQLCompareString(baseName, "= ?", -1)
     }
 

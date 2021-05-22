@@ -10,5 +10,5 @@ class DatabaseSelector(val conn: Connection, database: String) {
 
     }
 
-    fun tableOf(table: String) = SQLTable(conn, table)
+    fun tableOf(table: String) = SQLTable(table, conn)
 }

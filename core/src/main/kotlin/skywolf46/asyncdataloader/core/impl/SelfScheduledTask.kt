@@ -30,7 +30,6 @@ object SelfScheduledTask : AbstractTaskReadyProvider() {
     override fun finalizeProvider() {
         println("AsyncDataLoader-Core | Finalizing task provider..")
         isClosing.set(true)
-
         pool.shutdown()
         println("AsyncDataLoader-Core | Task provider finalized.")
     }
@@ -46,11 +45,17 @@ object SelfScheduledTask : AbstractTaskReadyProvider() {
             cancelled.set(true)
         } else {
             pool.schedule(ShutdownSafeRunnable(isClosing, {
-                scheduleRepeat(cancelled, provider)
-                println("Scheduled.")
+                try {
+                    scheduleRepeat(cancelled, provider)
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                }
             }) {
-                println("Force save.")
-                provider.data.forceSave()
+                try {
+                    provider.data.forceSave()
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                }
             }, 1, TimeUnit.SECONDS)
         }
     }

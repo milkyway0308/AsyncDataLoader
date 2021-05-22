@@ -10,7 +10,7 @@ class SQLDeleter(table: SQLTable) : AbstractQueryable(table) {
 
     @Suppress("DuplicatedCode")
     override fun getSQLString(): String {
-        val sb = StringBuilder("delete from ${table.tableName} where")
+        val sb = StringBuilder("delete from ${table.tableName} where ")
         for (x in sqlCompare) {
             sb.append("${x.first.toSQLEqualString(x.second).first}, ")
         }
@@ -59,6 +59,7 @@ class SQLDeleter(table: SQLTable) : AbstractQueryable(table) {
 
         }
     }
+
 
 
 }

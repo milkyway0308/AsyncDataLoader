@@ -24,6 +24,11 @@ class SQLMinecraft {
             statement.appendDouble(data.x)
             statement.appendDouble(data.y)
             statement.appendDouble(data.z)
+
+        }
+
+        override fun requires(): List<ISQLStructure<*>> {
+            return listOf(SQLBases.String(100), SQLBases.Double, SQLBases.Double, SQLBases.Double)
         }
     }
 
@@ -39,6 +44,7 @@ class SQLMinecraft {
         override fun deconstruct(data: org.bukkit.inventory.ItemStack, statement: IStatementInput) {
             statement.appendByteArray(BukkitUtil.toByte(data)!!)
         }
+
 
     }
 

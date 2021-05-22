@@ -81,31 +81,41 @@ class RunOnShutdownScheduledExecutorService(delegate: ScheduledExecutorService) 
 
     @Synchronized
     override fun shutdown() {
-        if (delegate.isShutdown) return
+        if (delegate.isShutdown) {
+            return
+        }
         scheduledThreadPoolExecutor?.executeExistingDelayedTasksAfterShutdownPolicy = false
         delegate.shutdown()
         // Users will not be able to cancel() Futures past this point so we're guaranteed that
         // "tasks" will not be modified.
         val outstandingTasks: MutableList<Callable<*>> = Lists.newArrayList()
         for ((future, task) in tasks) {
-            if (future.isDone() && future.isCancelled()) {
+            if (future.isDone && future.isCancelled) {
                 // Task called by the underlying executor, not the user. See CleaningScheduledFuture.
                 outstandingTasks.add(task)
             }
         }
         tasks.clear()
         if (outstandingTasks.isEmpty()) {
-            immediateService!!.shutdown()
+            immediateService.shutdown()
             return
         }
-        immediateService!!.submit<Void> {
-            delegate.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS)
-
-            // Execute outstanding tasks only after the delegate executor finishes shutting down
-            for (task in outstandingTasks) immediateService.submit(task)
-            immediateService.shutdown()
-            null
+        delegate.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS)
+        for (task in outstandingTasks) {
+            task.call()
         }
+        immediateService.shutdown()
+        immediateService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS)
+
+//        immediateService!!.submit<Void> {
+//            delegate.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS)
+//
+//            // Execute outstanding tasks only after the delegate executor finishes shutting down
+//            for (task in outstandingTasks) immediateService.submit(task)
+//            immediateService.shutdown()
+//            println("X101")
+//            null
+//        }
     }
 
     override fun shutdownNow(): List<Runnable> {
@@ -196,11 +206,11 @@ class RunOnShutdownScheduledExecutorService(delegate: ScheduledExecutorService) 
         }
 
         override fun isCancelled(): Boolean {
-            return delegate.isCancelled()
+            return delegate.isCancelled
         }
 
         override fun isDone(): Boolean {
-            return delegate.isDone()
+            return delegate.isDone
         }
 
         @Throws(InterruptedException::class, ExecutionException::class)

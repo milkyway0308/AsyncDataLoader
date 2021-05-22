@@ -6,6 +6,6 @@ import skywolf46.asyncdataloader.mysql.util.SQLTable
 
 abstract class SQLBasedSnapshot() : AbstractDataSnapshot() {
     fun sql(table: String, unit: SQLTable.() -> Unit) {
-        unit(SQLTable(MySQLLoaderInitializer.pool?.connection, table))
+        unit(SQLTable(table, MySQLLoaderInitializer.connection().conn))
     }
 }

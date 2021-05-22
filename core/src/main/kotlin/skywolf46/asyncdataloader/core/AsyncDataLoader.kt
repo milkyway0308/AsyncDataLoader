@@ -19,6 +19,11 @@ class AsyncDataLoader : JavaPlugin() {
     }
 
     override fun onDisable() {
+        disableProvider()
+    }
+
+    fun disableProvider() {
         AbstractTaskReadyProvider.defaultTask?.finalizeProvider()
+        AbstractTaskReadyProvider.defaultTask = null
     }
 }

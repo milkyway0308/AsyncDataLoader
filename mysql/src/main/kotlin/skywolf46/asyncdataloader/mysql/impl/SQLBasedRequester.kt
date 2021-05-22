@@ -12,7 +12,7 @@ import java.sql.Connection
 class SQLBasedRequester(private val conn: Connection) : AbstractDataLoadRequester<String, SQLTable>() {
 
     override fun request(param: String): SQLTable {
-        return SQLTable(conn, param)
+        return SQLTable(param, conn)
     }
 
     override fun trigger(data: String, main: (SQLTable) -> Unit, afterRun: (LoadState) -> Unit) {
@@ -27,7 +27,7 @@ class SQLBasedRequester(private val conn: Connection) : AbstractDataLoadRequeste
 }
 
 fun <T : AbstractDataLoader<*>> T.loadSQL(
-    connection: Connection = MySQLLoaderInitializer.pool!!.connection,
+    connection: Connection = MySQLLoaderInitializer.connection().conn,
     table: String,
     unit: SQLTable.() -> Unit,
 ) {
@@ -36,7 +36,7 @@ fun <T : AbstractDataLoader<*>> T.loadSQL(
 
 
 fun <T : AbstractDataLoader<*>> T.loadSQLAsync(
-    connection: Connection = MySQLLoaderInitializer.pool!!.connection,
+    connection: Connection = MySQLLoaderInitializer.connection().conn,
     table: String,
     unit: SQLTable.() -> Unit,
 ) {
@@ -45,7 +45,7 @@ fun <T : AbstractDataLoader<*>> T.loadSQLAsync(
 
 
 fun <T : AbstractDataLoader<*>> T.loadSQL(table: String, unit: SQLTable.() -> Unit) {
-    this.loadSQL(table, unit)
+    this.loadSQL(MySQLLoaderInitializer.connection().conn, table, unit)
 }
 
 
